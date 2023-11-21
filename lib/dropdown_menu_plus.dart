@@ -1,4 +1,4 @@
-library gzx_dropdown_menu;
+library dropdown_menu_plus;
 
 export 'src/gzx_dropdown_header.dart';
 export 'src/gzx_dropdown_menu.dart';

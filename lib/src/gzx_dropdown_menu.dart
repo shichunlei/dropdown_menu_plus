@@ -10,10 +10,7 @@ class GZXDropdownMenuBuilder {
   /// Dropdown menu height.
   final double dropDownHeight;
 
-  GZXDropdownMenuBuilder({
-    required this.dropDownWidget,
-    required this.dropDownHeight,
-  });
+  GZXDropdownMenuBuilder({required this.dropDownWidget, required this.dropDownHeight});
 }
 
 typedef DropdownMenuChange = void Function(bool isShow, int? index);
@@ -23,7 +20,8 @@ class GZXDropDownMenu extends StatefulWidget {
   final GZXDropdownMenuController controller;
   final List<GZXDropdownMenuBuilder> menus;
   final int animationMilliseconds;
-  final Color maskColor;
+  final Color? maskColor;
+  final Color? menuBgColor;
 
   /// Called when dropdown menu start showing or hiding.
   final DropdownMenuChange? dropdownMenuChanging;
@@ -33,22 +31,21 @@ class GZXDropDownMenu extends StatefulWidget {
 
   /// Creates a dropdown menu widget.
   /// The widget must be inside the Stack because the widget is a Positioned.
-  const GZXDropDownMenu({
-    Key? key,
-    required this.controller,
-    required this.menus,
-    this.animationMilliseconds = 500,
-    this.maskColor = const Color.fromRGBO(0, 0, 0, 0.5),
-    this.dropdownMenuChanging,
-    this.dropdownMenuChanged,
-  }) : super(key: key);
+  const GZXDropDownMenu(
+      {super.key,
+      required this.controller,
+      required this.menus,
+      this.animationMilliseconds = 500,
+      this.maskColor,
+      this.dropdownMenuChanging,
+      this.dropdownMenuChanged,
+      this.menuBgColor});
 
   @override
-  _GZXDropDownMenuState createState() => _GZXDropDownMenuState();
+  createState() => _GZXDropDownMenuState();
 }
 
-class _GZXDropDownMenuState extends State<GZXDropDownMenu>
-    with SingleTickerProviderStateMixin {
+class _GZXDropDownMenuState extends State<GZXDropDownMenu> with SingleTickerProviderStateMixin {
   bool _isShowDropDownItemWidget = false;
   bool _isShowMask = false;
   bool _isControllerDisposed = false;
@@ -63,30 +60,24 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     widget.controller.addListener(_onController);
-    _controller = new AnimationController(
-        duration: Duration(milliseconds: widget.animationMilliseconds),
-        vsync: this);
+    _controller = AnimationController(duration: Duration(milliseconds: widget.animationMilliseconds), vsync: this);
   }
 
   _onController() {
-//    print('_GZXDropDownMenuState._onController ${widget.controller.menuIndex}');
-
     _showDropDownItemWidget();
   }
 
   @override
   Widget build(BuildContext context) {
-//    print('_GZXDropDownMenuState.build');
-    _controller!.duration =
-        Duration(milliseconds: widget.animationMilliseconds);
+    _controller!.duration = Duration(milliseconds: widget.animationMilliseconds);
     return _buildDropDownWidget();
   }
 
-  dispose() {
+  @override
+  void dispose() {
     _animation?.removeListener(_animationListener);
     _animation?.removeStatusListener(_animationStatusListener);
     widget.controller.removeListener(_onController);
@@ -103,8 +94,7 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
 
     _isShowDropDownItemWidget = !_isShowDropDownItemWidget;
     if (widget.dropdownMenuChanging != null) {
-      widget.dropdownMenuChanging!(
-          _isShowDropDownItemWidget, _currentMenuIndex);
+      widget.dropdownMenuChanging!(_isShowDropDownItemWidget, _currentMenuIndex);
     }
     if (!_isShowMask) {
       _isShowMask = true;
@@ -114,14 +104,11 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
 
     _animation?.removeListener(_animationListener);
     _animation?.removeStatusListener(_animationStatusListener);
-    _animation =
-        new Tween(begin: 0.0, end: _dropDownHeight).animate(_controller!)
-          ..addListener(_animationListener)
-          ..addStatusListener(_animationStatusListener);
+    _animation = Tween(begin: 0.0, end: _dropDownHeight).animate(_controller!)
+      ..addListener(_animationListener)
+      ..addStatusListener(_animationStatusListener);
 
     if (_isControllerDisposed) return;
-
-//    print('${widget.controller.isShow}');
 
     if (widget.controller.isShow) {
       _controller!.forward();
@@ -135,20 +122,16 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
   void _animationStatusListener(AnimationStatus status) {
     switch (status) {
       case AnimationStatus.dismissed:
-//        print('dismissed');
         _isShowMask = false;
         if (widget.dropdownMenuChanged != null) {
           widget.dropdownMenuChanged!(false, _currentMenuIndex);
         }
         break;
       case AnimationStatus.forward:
-        // TODO: Handle this case.
         break;
       case AnimationStatus.reverse:
-        // TODO: Handle this case.
         break;
       case AnimationStatus.completed:
-//        print('completed');
         if (widget.dropdownMenuChanged != null) {
           widget.dropdownMenuChanged!(true, _currentMenuIndex);
         }
@@ -158,8 +141,7 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
 
   void _animationListener() {
     var heightScale = _animation!.value / _dropDownHeight!;
-    _maskColorOpacity = widget.maskColor.opacity * heightScale;
-//    print('$_maskColorOpacity');
+    _maskColorOpacity = (widget.maskColor ?? const Color.fromRGBO(0, 0, 0, 0.5)).opacity * heightScale;
     //这行如果不写，没有动画效果
     setState(() {});
   }
@@ -167,20 +149,15 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
   Widget _mask() {
     if (_isShowMask) {
       return GestureDetector(
-        onTap: () {
-          widget.controller.hide();
-        },
-        child: Container(
-          width: double.infinity,
-          height: MediaQuery.of(context).size.height,
-          color: widget.maskColor.withOpacity(_maskColorOpacity),
-//          color: widget.maskColor,
-        ),
-      );
+          onTap: () {
+            widget.controller.hide();
+          },
+          child: Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height,
+              color: (widget.maskColor ?? const Color.fromRGBO(0, 0, 0, 0.5)).withOpacity(_maskColorOpacity)));
     } else {
-      return Container(
-        height: 0,
-      );
+      return Container(height: 0);
     }
   }
 
@@ -188,23 +165,20 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
     int menuIndex = widget.controller.menuIndex;
 
     if (menuIndex >= widget.menus.length) {
-      return Container();
+      return const SizedBox();
     }
 
     return Positioned(
         top: widget.controller.dropDownMenuTop,
         left: 0,
         right: 0,
-        child: Column(
-          children: <Widget>[
-            Container(
-              color: Colors.white,
+        child: Column(children: [
+          Container(
+              color: widget.menuBgColor ?? Colors.white,
               width: double.infinity,
               height: _animation == null ? 0 : _animation!.value,
-              child: widget.menus[menuIndex].dropDownWidget,
-            ),
-            _mask(),
-          ],
-        ));
+              child: widget.menus[menuIndex].dropDownWidget),
+          _mask()
+        ]));
   }
 }

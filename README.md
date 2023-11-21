@@ -1,4 +1,4 @@
-# gzx_dropdown_menu
+# dropdown_menu_plus
 
 [![Pub Package](https://img.shields.io/pub/v/gzx_dropdown_menu.svg)](https://pub.dev/packages/gzx_dropdown_menu)
 [![GitHub Stars](https://img.shields.io/github/stars/ganzhixiong/gzx_dropdown_menu.svg)](https://github.com/ganzhixiong/gzx_dropdown_menu/stargazers)
@@ -59,7 +59,7 @@ A custom is strong dropdown menu for Flutter. Easy to use and powerful for custo
 打开pubspec.yaml文件
 添加如下代码
 ``` dart
-  gzx_dropdown_menu: ^3.1.0
+  dropdown_menu_plus: ^3.1.0
 ```
 添加后打开Terminal，执行flutter packages get
 
@@ -187,12 +187,3 @@ GZXDropDownMenu(
   ],
 ),
 ```
-
-# 相关Repository
-* [Flutter 淘宝App](https://github.com/GanZhiXiong/GZXTaoBaoAppFlutter)
-
-# 相关文章
-* [作者CSDN](https://blog.csdn.net/oHaiKuoTianKong1682)
-
-# 捐助开发者
-![](https://github.com/GanZhiXiong/GZXTaoBaoAppFlutter/blob/master/preview_images/thanks.png)
